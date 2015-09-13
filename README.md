@@ -1,6 +1,5 @@
 # facerecognition
-
-Add pictures into 'common/src/main/resources/recognition/training' named in the following manner:
+To use this program you must first add pictures to the database. Add pictures (preferably 1080x720) into 'common/src/main/resources/recognition/training' named in the following manner:
 
 \<person-id>-\<person-name>_\<picture-id>.\<file-extension>
 
