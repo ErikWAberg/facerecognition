@@ -10,20 +10,22 @@ e.g.
 2-Bob_2.jpg
 ...
 
-* Generate Intellij Project: *
+### Generate Intellij Project: 
 ./gradlew ideaModule
 
 
-* Run the REST-service: *
+### Run the REST-service: 
 ./gradlew service:run
 
-* Run the client: *
+###  Run the client:
 ./gradlew app:run
 
 
-* Using jar files: *
+### Using jar files: 
 ./gradlew assemble
+
 java -jar service/build/libs/facerecog-service.jar
+
 java -jar app/build/libs/facerecog-app.jar
 
 
