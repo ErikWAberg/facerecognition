@@ -1,13 +1,21 @@
 # facerecognition
 
-1. Add pictures into 'common/src/main/resources/recognition/training' named in the following manner:
-<person-id>-<person-name>_<picture-id>.<file-extension>
+Add pictures into 'common/src/main/resources/recognition/training' named in the following manner:
+
+\<person-id>-\<person-name>_\<picture-id>.\<file-extension>
+
 e.g.
+
 1-Alice_1.jpg
+
 1-Alice_2.jpg
+
 1-Alice_3.jpg
+
 2-Bob_1.jpg
+
 2-Bob_2.jpg
+
 ...
 
 ### Generate Intellij Project: 
