@@ -1,5 +1,17 @@
 # facerecognition
-To use this program you must first add pictures to the database. Add pictures (preferably 1080x720) into 'common/src/main/resources/recognition/training' named in the following manner:
+Deploys a web service & perform face recogntion by calling the service through a supplied client application.
+
+
+The project consists of three modules:
+* Common: all JavaCV related functionality is contained here, i.e. face recognition & detection, as well as camera capturing capabilities.
+* Service: web server with REST interface for face recogntion & detection.
+* App: uses camera device to capture images of user & sends recognition requests to the service.
+
+
+## Setup
+
+
+To use this program you must first add pictures to the database. Add pictures (preferably 1080x720) into the directory 'common/src/main/resources/recognition/training' (create this directory if needed) named in the following manner:
 
 \<person-id>-\<person-name>_\<picture-id>.\<file-extension>
 
