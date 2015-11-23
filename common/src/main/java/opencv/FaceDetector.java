@@ -39,7 +39,7 @@ public class FaceDetector {
         Loader.load(opencv_objdetect.class);
 
         String rootPath = Util.getProjectRootDir(FaceDetector.class);
-        Log.info("Loading training-images " + cascadeResourcePath + " @ " + rootPath);
+        Log.info("Loading feature-cascade '" + cascadeResourcePath + "' @ " + rootPath);
         File file = new File(rootPath + cascadeResourcePath);
 
         classifier = new CvHaarClassifierCascade(cvLoad(file.getAbsolutePath()));

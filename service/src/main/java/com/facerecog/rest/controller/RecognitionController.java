@@ -50,7 +50,7 @@ public class RecognitionController {
      *
      * @return DTO containing predicted name of person and down-scaled image with rect around face
      */
-    @RequestMapping(value = ApiUrls.URL_RECOG_IDENTIFY_ASYNC, method = RequestMethod.POST)
+    @RequestMapping(value = ApiUrls.URL_RECOG_DETECT_IDENTIFY, method = RequestMethod.POST)
     public
     Callable<RecognitionDTO>
     identifyAndDetectAsync(final HttpEntity<byte[]> requestEntity,
@@ -63,17 +63,17 @@ public class RecognitionController {
         return recognitionService.detectedAndIdentifyAsync(requestEntity.getBody(), imageType, imageWidth, imageHeight);
     }
 
-    @RequestMapping(value = ApiUrls.URL_RECOG_IDENTIFY, method = RequestMethod.POST)
+    @RequestMapping(value = ApiUrls.URL_RECOG_DETECT, method = RequestMethod.POST)
     public
     RecognitionDTO
-    identifyAndDetect(final HttpEntity<byte[]> requestEntity,
+    detect(final HttpEntity<byte[]> requestEntity,
                        @RequestHeader(value = "imageType") int imageType,
                        @RequestHeader(value = "imageWidth") int imageWidth,
                        @RequestHeader(value = "imageHeight") int imageHeight)
             throws ExecutionException, InterruptedException {
-        logger.info("Detection & identification. Image type: " + imageType + ", width: " + imageWidth+ ", height: " + imageHeight);
+        logger.info("Detection only. Image type: " + imageType + ", width: " + imageWidth+ ", height: " + imageHeight);
 
-        return recognitionService.detectAndIdentify(requestEntity.getBody(), imageType, imageWidth, imageHeight);
+        return recognitionService.detect(requestEntity.getBody(), imageType, imageWidth, imageHeight);
     }
 
     @RequestMapping(value = ApiUrls.URL_RECOG_IDENTIFY_SIMPLE, method = RequestMethod.POST)

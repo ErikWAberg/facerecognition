@@ -24,6 +24,7 @@ import org.bytedeco.javacpp.opencv_contrib.*;
 import org.bytedeco.javacpp.opencv_core.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.IntBuffer;
 import java.util.AbstractMap;
 
@@ -37,11 +38,11 @@ public class FaceRecogniser {
     private String trainResultsStoragePath;
     private File absoluteTrainingSetPath;
 
-    public FaceRecogniser(String trainingSetDirRelative, String trainResultsStoragePath) {
+    public FaceRecogniser(String trainingSetDirRelative, String trainResultsStoragePath) throws FileNotFoundException {
         this.trainResultsStoragePath = trainResultsStoragePath;
 
         String rootPath = Util.getProjectRootDir(FaceRecogniser.class);
-        Log.info("Loading training-images " + trainingSetDirRelative + " @ " + rootPath + "\n" + rootPath + trainingSetDirRelative);
+        Log.info("Loading training-images '" + trainingSetDirRelative + "' @ " + rootPath + "\n" + rootPath + trainingSetDirRelative);
         absoluteTrainingSetPath = new File(rootPath + trainingSetDirRelative);
 
         setLBPHAlgorithm();

@@ -23,6 +23,7 @@ import opencv.FaceDetector;
 import opencv.FaceRecogniser;
 import opencv.Util;
 import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.opencv_core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -30,20 +31,22 @@ import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 
 import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 @Service
-public class RecognitionService implements CommandLineRunner {
+public class RecognitionService {
 
     private FaceDetector detector;
     private FaceRecogniser recogniser;
     private Logger logger = LoggerFactory.getLogger(RecognitionService.class);
 
-    @Override
-    public void run(String... args) throws Exception {
+    public RecognitionService() throws FileNotFoundException, URISyntaxException {
+
         String sep = "/";
         if (System.getProperty("os.name").startsWith("Windows")) {
             sep = "\\";
@@ -57,29 +60,9 @@ public class RecognitionService implements CommandLineRunner {
 
         String cascadeResourcePath = sep + "resources" + sep + "main" + sep + "detection" + sep + "haar" + sep + "frontalface_alt.xml";
         detector = new FaceDetector(cascadeResourcePath);
+
     }
 
-    private static RecognitionDTO createIdentificationResponse(String predictedPerson, Mat mat) {
-        RecognitionDTO recognitionDTO = new RecognitionDTO();
-        recognitionDTO.setPredictedPerson(predictedPerson);
-        recognitionDTO.setBytes(Util.matToBytes(mat));
-        recognitionDTO.setCols(mat.cols());
-        recognitionDTO.setRows(mat.rows());
-        recognitionDTO.setType(mat.type());
-        return recognitionDTO;
-    }
-
-    public String simpleIdentification(byte[] byteImage) {
-        long t1 = System.currentTimeMillis();
-        IplImage iplColored = IplImage.create(1080, 720, IPL_DEPTH_8U, 3);
-        BytePointer bp = iplColored.imageData();
-        bp.put(byteImage);
-        IplImage iplGray = Util.iplImage2gray(iplColored);
-        Mat matGray = cvarrToMat(iplGray);
-        String predictedPerson = recogniser.predictPerson(matGray);
-        logger.info("Request completed after: " + (System.currentTimeMillis() - t1));
-        return predictedPerson;
-    }
 
     public Callable<RecognitionDTO> detectedAndIdentifyAsync(final byte[] byteImage, final int imageType, final int imageWidth, final int imageHeight) {
         return new Callable<RecognitionDTO>() {
@@ -90,8 +73,39 @@ public class RecognitionService implements CommandLineRunner {
         };
     }
 
+    public RecognitionDTO detect(byte[] byteImage, int type, int width, int height) {
+        long t1 = System.currentTimeMillis();
+        Mat imageMat = convertBytesToImage(byteImage, type, width, height);
+
+        Mat imageMatResized = new Mat(imageMat.rows() / 4, imageMat.cols() / 4, imageMat.type());
+        cvResize(imageMat.asCvMat(), imageMatResized.asCvMat(), CV_INTER_AREA);
+        detector.detectFaces(imageMatResized);
+        RecognitionDTO response = createIdentificationResponse("", imageMatResized);
+        logger.info("Request completed after: " + (System.currentTimeMillis() - t1) + "ms");
+
+        return response;
+
+    }
     public RecognitionDTO detectAndIdentify(byte[] byteImage, int type, int width, int height) {
         long t1 = System.currentTimeMillis();
+        Mat imageMat = convertBytesToImage(byteImage, type, width, height);
+
+        Mat imageMatResized = new Mat(imageMat.rows() / 4, imageMat.cols() / 4, imageMat.type());
+        cvResize(imageMat.asCvMat(), imageMatResized.asCvMat(), CV_INTER_AREA);
+
+        //cvEqualizeHist(imageMatResized.asCvMat(), imageMatResized.asCvMat());
+
+        String predictedPerson = recogniser.predictPerson(imageMatResized);
+        detector.detectFaces(imageMatResized);
+
+        RecognitionDTO response = createIdentificationResponse(predictedPerson, imageMatResized);
+
+        logger.info("Request completed after: " + (System.currentTimeMillis() - t1) + "ms (" + predictedPerson + ")");
+
+        return response;
+    }
+
+    private Mat convertBytesToImage(byte[] byteImage, int type, int width, int height) {
         int matType = -1;
 
         switch (type) {
@@ -112,21 +126,31 @@ public class RecognitionService implements CommandLineRunner {
             cvtColor(imageMat, matGray, CV_RGB2GRAY);
             imageMat = matGray;
         }
-
-        Mat imageMatResized = new Mat(imageMat.rows() / 4, imageMat.cols() / 4, imageMat.type());
-        cvResize(imageMat.asCvMat(), imageMatResized.asCvMat(), CV_INTER_AREA);
-
-        //cvEqualizeHist(imageMatResized.asCvMat(), imageMatResized.asCvMat());
-
-        String predictedPerson = recogniser.predictPerson(imageMatResized);
-        detector.detectFaces(imageMatResized);
-
-        RecognitionDTO response = createIdentificationResponse(predictedPerson, imageMatResized);
-
-        logger.info("Request completed after: " + (System.currentTimeMillis() - t1) + "ms (" + predictedPerson + ")");
-
-        return response;
+        return imageMat;
     }
+
+    public String simpleIdentification(byte[] byteImage) {
+        long t1 = System.currentTimeMillis();
+        IplImage iplColored = IplImage.create(1080, 720, IPL_DEPTH_8U, 3);
+        BytePointer bp = iplColored.imageData();
+        bp.put(byteImage);
+        IplImage iplGray = Util.iplImage2gray(iplColored);
+        Mat matGray = cvarrToMat(iplGray);
+        String predictedPerson = recogniser.predictPerson(matGray);
+        logger.info("Request completed after: " + (System.currentTimeMillis() - t1));
+        return predictedPerson;
+    }
+
+    private static RecognitionDTO createIdentificationResponse(String predictedPerson, Mat mat) {
+        RecognitionDTO recognitionDTO = new RecognitionDTO();
+        recognitionDTO.setPredictedPerson(predictedPerson);
+        recognitionDTO.setBytes(Util.matToBytes(mat));
+        recognitionDTO.setCols(mat.cols());
+        recognitionDTO.setRows(mat.rows());
+        recognitionDTO.setType(mat.type());
+        return recognitionDTO;
+    }
+
 }
 
 

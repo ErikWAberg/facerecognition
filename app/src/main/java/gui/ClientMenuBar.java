@@ -16,10 +16,11 @@
  *
  */
 
-package client;
+package gui;
 
 
 import api.ApiUrls;
+import controll.MenuBarController;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -36,7 +37,7 @@ public class ClientMenuBar extends JMenuBar implements ActionListener {
     private JMenuItem requestInterval;
     private JMenuItem serviceUrl;
     private JRadioButtonMenuItem radioAsync;
-    private JRadioButtonMenuItem radioNonAsync;
+    private JRadioButtonMenuItem detect;
 
     public ClientMenuBar(MenuBarController menuBarController) {
         super();
@@ -66,14 +67,15 @@ public class ClientMenuBar extends JMenuBar implements ActionListener {
         settingsMenu.addSeparator();
 
         ButtonGroup group = new ButtonGroup();
-        radioAsync = new JRadioButtonMenuItem(ApiUrls.ROOT_URL_RECOG + ApiUrls.URL_RECOG_IDENTIFY_ASYNC);
+
+        radioAsync = new JRadioButtonMenuItem(ApiUrls.ROOT_URL_RECOG + ApiUrls.URL_RECOG_DETECT_IDENTIFY);
         radioAsync.setSelected(true);
         group.add(radioAsync);
         settingsMenu.add(radioAsync);
 
-        radioNonAsync = new JRadioButtonMenuItem(ApiUrls.ROOT_URL_RECOG + ApiUrls.URL_RECOG_IDENTIFY);
-        group.add(radioNonAsync);
-        settingsMenu.add(radioNonAsync);
+        detect = new JRadioButtonMenuItem(ApiUrls.ROOT_URL_RECOG + ApiUrls.URL_RECOG_DETECT);
+        group.add(detect);
+        settingsMenu.add(detect);
 
         add(settingsMenu);
     }
@@ -83,7 +85,7 @@ public class ClientMenuBar extends JMenuBar implements ActionListener {
         requestInterval.addActionListener(this);
         serviceUrl.addActionListener(this);
         radioAsync.addActionListener(this);
-        radioNonAsync.addActionListener(this);
+        detect.addActionListener(this);
     }
 
     @Override
@@ -110,8 +112,8 @@ public class ClientMenuBar extends JMenuBar implements ActionListener {
             }
         } else if(src == radioAsync) {
             menuBarController.setServiceType(radioAsync.getText());
-        } else if(src == radioNonAsync) {
-            menuBarController.setServiceType(radioNonAsync.getText());
+        } else if(src == detect) {
+            menuBarController.setServiceType(detect.getText());
         }
 
     }

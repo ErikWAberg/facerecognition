@@ -16,18 +16,16 @@
  *
  */
 
-package client;
+package gui;
 
-import dto.RecognitionDTO;
-import opencv.Util;
+import controll.CameraController;
+import controll.MenuBarController;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ClientUI {
 

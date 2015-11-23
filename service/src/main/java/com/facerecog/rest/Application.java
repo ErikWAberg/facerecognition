@@ -18,9 +18,11 @@
 
 package com.facerecog.rest;
 
+import com.facerecog.rest.service.RecognitionService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.converter.json.SpringHandlerInstantiator;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -35,6 +37,11 @@ public class Application {
 
     public static void main(String[] args) throws FileNotFoundException, URISyntaxException {
         SpringApplication.run(Application.class, args);
+    }
+
+    @Bean
+    public RecognitionService recognitionService() throws FileNotFoundException, URISyntaxException {
+        return new RecognitionService();
     }
 
 }

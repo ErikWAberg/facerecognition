@@ -16,7 +16,7 @@
  *
  */
 
-package client;
+package controll;
 
 
 public interface MenuBarController {

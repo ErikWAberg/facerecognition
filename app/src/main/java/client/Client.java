@@ -19,10 +19,13 @@
 package client;
 
 
-
 import api.ApiUrls;
 import com.esotericsoftware.minlog.Log;
+import controll.CameraController;
+import controll.MenuBarController;
+import controll.ServiceController;
 import dto.RecognitionDTO;
+import gui.ClientUI;
 import opencv.CameraCapture;
 import opencv.Util;
 
@@ -36,9 +39,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
-public class Client implements Observer, CameraController, MenuBarController {
+public class Client implements Observer, ServiceController, CameraController, MenuBarController {
 
-    private static String SERVICE_TYPE = ApiUrls.ROOT_URL_RECOG + ApiUrls.URL_RECOG_IDENTIFY_ASYNC;
+    private static String SERVICE_TYPE = ApiUrls.ROOT_URL_RECOG + ApiUrls.URL_RECOG_DETECT_IDENTIFY;
     private static String SERVICE_URL = "http://localhost:8080";
     private static String SERVICE_REQUEST_URL = SERVICE_URL + SERVICE_TYPE;
     private static double CAMERA_CAPTURE_INTERVAL_IN_SEC = 0.2;
@@ -72,32 +75,31 @@ public class Client implements Observer, CameraController, MenuBarController {
 
         clientUI = new ClientUI(captureWidth / 4, captureHeight / 4, this, this);
 
-        serviceRequester = new ServiceRequester(capturedImageQueue, SERVICE_REQUEST_URL);
-        serviceRequester.addObserver(this);
+        serviceRequester = new ServiceRequester(capturedImageQueue, SERVICE_REQUEST_URL, this);
     }
 
-    private void updateServedImage(final RecognitionDTO recognitionDTO) {
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                BufferedImage bufferedImage = Util.identificationDtoToBufferedImage(recognitionDTO);
-                clientUI.updateServedImage(bufferedImage, recognitionDTO.getPredictedPerson());
-            }
-        });
-
-    }
 
     @Override
     public void update(Observable observable, Object arg) {
-        if(observable instanceof CameraCapture) {
+        if (observable instanceof CameraCapture) {
             String msg = (String) arg;
             if (msg.equals("STOPPED")) {
                 stopCameraCapture(buttonCaptureStart, buttonCaptureStop);
             }
-        } else if(observable instanceof ServiceRequester) {
-            RecognitionDTO response = (RecognitionDTO) arg;
-            updateServedImage(response);
         }
+
+    }
+
+    //---------------- ServiceController interface -----------------
+    @Override
+    public void receivedRecognitionDto(final RecognitionDTO recognitionResponse) {
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                BufferedImage bufferedImage = Util.identificationDtoToBufferedImage(recognitionResponse);
+                clientUI.updateServedImage(bufferedImage, recognitionResponse.getPredictedPerson());
+            }
+        });
 
     }
 
@@ -122,7 +124,7 @@ public class Client implements Observer, CameraController, MenuBarController {
 
     @Override
     public void stopCameraCapture(JButton buttonCaptureStart, JButton buttonCaptureStop) {
-        if(activeCameraCapture) {
+        if (activeCameraCapture) {
             activeCameraCapture = false;
             Log.info("Camera capture stopped");
             buttonCaptureStart.setEnabled(true);
@@ -172,5 +174,7 @@ public class Client implements Observer, CameraController, MenuBarController {
         serviceRequester.setServiceUrl(SERVICE_REQUEST_URL);
 
     }
+
+
 }
 

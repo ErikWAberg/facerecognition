@@ -19,6 +19,7 @@
 package client;
 
 import com.esotericsoftware.minlog.Log;
+import controll.ServiceController;
 import dto.RecognitionDTO;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -30,14 +31,16 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class ServiceRequester extends Observable implements Runnable {
+public class ServiceRequester implements Runnable {
 
-    private  LinkedBlockingQueue<BufferedImage> imageQueue;
+    private LinkedBlockingQueue<BufferedImage> imageQueue;
     private String serviceUrl;
+    private final ServiceController serviceController;
     private volatile boolean running;
     private RestTemplate restTemplate;
     private Thread runningThread;
@@ -45,14 +48,14 @@ public class ServiceRequester extends Observable implements Runnable {
     private final List<ClientHttpRequestInterceptor> requestInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
 
 
-    public ServiceRequester(LinkedBlockingQueue<BufferedImage> imageQueue, String serviceUrl) {
+    public ServiceRequester(LinkedBlockingQueue<BufferedImage> imageQueue, String serviceUrl, ServiceController serviceController) {
         this.imageQueue = imageQueue;
         this.serviceUrl = serviceUrl;
+        this.serviceController = serviceController;
         this.restTemplate = new RestTemplate();
 
         //this.requestInterceptors.add(new PerfRequestSyncInterceptor());
         //this.restTemplate.setInterceptors(requestInterceptors);
-
     }
 
     public HttpEntity<byte[]> createRequestHeaders(BufferedImage image) {
@@ -89,13 +92,12 @@ public class ServiceRequester extends Observable implements Runnable {
                     HttpEntity<byte[]> request = createRequestHeaders(image);
 
                     RecognitionDTO responseDto = restTemplate.postForObject(serviceUrl, request, RecognitionDTO.class);
-
-                    setChanged();
-                    notifyObservers(responseDto);
+                    serviceController.receivedRecognitionDto(responseDto);
 
                     Log.info("Total request time: " + (System.currentTimeMillis() - requestStartTime));
                     Log.info("--------------------------------------");
                 }
+
             } catch (InterruptedException e) {
                 shutdown();
             }

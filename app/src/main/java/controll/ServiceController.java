@@ -16,14 +16,12 @@
  *
  */
 
-package client;
+package controll;
 
+import dto.RecognitionDTO;
 
-import javax.swing.*;
+import java.awt.image.BufferedImage;
 
-public interface CameraController {
-
-    void startCameraCapture(JButton buttonCaptureStart, JButton buttonCaptureStop);
-
-    void stopCameraCapture(JButton buttonCaptureStart, JButton buttonCaptureStop);
+public interface ServiceController {
+    void receivedRecognitionDto(RecognitionDTO recognitionResponse);
 }

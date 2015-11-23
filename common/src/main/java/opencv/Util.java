@@ -27,6 +27,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.security.CodeSource;
 
@@ -172,7 +173,7 @@ public class Util {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    public static String getProjectRootDir(Class c) {
+    public static String getProjectRootDir(Class c) throws FileNotFoundException {
         CodeSource codeSource = c.getProtectionDomain().getCodeSource();
         File file = new File(codeSource.getLocation().getPath());
         Log.info("Locating resource folder");
@@ -185,14 +186,23 @@ public class Util {
             Log.info("jar-folder: " + jarFolder);
             file = new File(jarFolder);
             Log.info("Parent: " + file.getParentFile().getPath());
-            return file.getParentFile().getPath().replaceAll("file:", "");
+
+            file = new File(file.getParentFile().getPath().replaceAll("file:", ""));
         } else {
             Log.info("Parent: " + file.getParentFile().toString());
-            Log.info("Parent-parent: " + file.getParentFile().toString());
-            String root = file.getParentFile().getParentFile().getPath();
-            root = root.replaceAll("file:", "");
-            return root;
+            Log.info("Parent-parent: " + file.getParentFile().getParentFile().toString());
+            file = new File(file.getParentFile().getParentFile().getAbsolutePath().replaceAll("file:",""));
         }
+        boolean foundResources = false;
+        for(String fileName : file.list()) {
+            if(fileName.equals("resources")) {
+                foundResources = true;
+            }
+        }
+        if(!foundResources) {
+            throw new FileNotFoundException("Resource folder not found!");
+        }
+        return file.getAbsolutePath();
     }
 
     public static  BufferedImage identificationDtoToBufferedImage(RecognitionDTO entityDTO) {
