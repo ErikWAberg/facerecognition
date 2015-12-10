@@ -23,8 +23,8 @@ import javax.swing.*;
 
 public interface CameraController {
 
-    void startCameraCapture(JButton buttonCaptureStart, JButton buttonCaptureStop);
+    void startCameraCapture();
 
-    void stopCameraCapture(JButton buttonCaptureStart, JButton buttonCaptureStop);
+    void stopCameraCapture();
 
 }

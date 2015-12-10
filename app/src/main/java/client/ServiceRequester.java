@@ -77,7 +77,6 @@ public class ServiceRequester implements Runnable {
     public void run() {
         runningThread = Thread.currentThread();
         running = true;
-        long requestStartTime;
 
         while (running) {
             try {
@@ -87,15 +86,10 @@ public class ServiceRequester implements Runnable {
                 if (!running && imageQueue.isEmpty())
                     return;
                 if (image != null) {
-                    requestStartTime = System.currentTimeMillis();
 
-                    HttpEntity<byte[]> request = createRequestHeaders(image);
+                    executeRequest(image);
 
-                    RecognitionDTO responseDto = restTemplate.postForObject(serviceUrl, request, RecognitionDTO.class);
-                    serviceController.receivedRecognitionDto(responseDto);
 
-                    Log.info("Total request time: " + (System.currentTimeMillis() - requestStartTime));
-                    Log.info("--------------------------------------");
                 }
 
             } catch (InterruptedException e) {
@@ -103,6 +97,20 @@ public class ServiceRequester implements Runnable {
             }
         }
 
+    }
+
+    public void executeRequest(BufferedImage image) {
+        long requestStartTime = System.currentTimeMillis();
+
+        HttpEntity<byte[]> request = createRequestHeaders(image);
+
+        RecognitionDTO responseDto = restTemplate.postForObject(serviceUrl, request, RecognitionDTO.class);
+        if(responseDto.getPredictedPerson().length() > 0) {
+            Log.info("Identified person: " + responseDto.getPredictedPerson());
+        }
+        Log.info("Total request time: " + (System.currentTimeMillis() - requestStartTime));
+        Log.info("--------------------------------------");
+        serviceController.receivedRecognitionDto(responseDto);
     }
 
     public void shutdown() {

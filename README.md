@@ -45,5 +45,11 @@ e.g.
 
 java -jar service/build/libs/facerecog-service.jar
 
+With GUI:
+
 java -jar app/build/libs/facerecog-app.jar
+
+Without GUI:
+
+java -jar app/build/libs/facerecog-app.jar --nogui --path /Users/john/Pictures/johnProfile.jpg --url http://localhost:8080 --type /recog/detectIdentify --outdir /Users/john/recogPictures
 

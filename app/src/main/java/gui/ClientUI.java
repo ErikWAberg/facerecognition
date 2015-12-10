@@ -108,13 +108,13 @@ public class ClientUI {
         buttonStartCapture.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cameraController.startCameraCapture(buttonStartCapture, buttonStopCapture);
+                cameraController.startCameraCapture();
             }
         });
         buttonStopCapture.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cameraController.stopCameraCapture(buttonStartCapture, buttonStopCapture);
+                cameraController.stopCameraCapture();
             }
         });
 
@@ -144,6 +144,13 @@ public class ClientUI {
     }
 
 
+    public void toggleCameraOn() {
+        buttonStartCapture.setEnabled(false);
+        buttonStopCapture.setEnabled(true);
+    }
 
-
+    public void toggleCameraOff() {
+        buttonStartCapture.setEnabled(true);
+        buttonStopCapture.setEnabled(false);
+    }
 }

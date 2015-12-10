@@ -176,21 +176,21 @@ public class Util {
     public static String getProjectRootDir(Class c) throws FileNotFoundException {
         CodeSource codeSource = c.getProtectionDomain().getCodeSource();
         File file = new File(codeSource.getLocation().getPath());
-        Log.info("Locating resource folder");
-        Log.info("Full: " + file.toString());
+        //Log.info("Locating resource folder");
+        //Log.info("Full: " + file.toString());
 
         if(file.toString().contains("!")) {
             String jarFolder = file.toString();
             jarFolder = jarFolder.substring(0, jarFolder.indexOf("!"));
             jarFolder = jarFolder.substring(0,jarFolder.lastIndexOf("/"));
-            Log.info("jar-folder: " + jarFolder);
+            //Log.info("jar-folder: " + jarFolder);
             file = new File(jarFolder);
-            Log.info("Parent: " + file.getParentFile().getPath());
+            //Log.info("Parent: " + file.getParentFile().getPath());
 
             file = new File(file.getParentFile().getPath().replaceAll("file:", ""));
         } else {
-            Log.info("Parent: " + file.getParentFile().toString());
-            Log.info("Parent-parent: " + file.getParentFile().getParentFile().toString());
+            //Log.info("Parent: " + file.getParentFile().toString());
+            //Log.info("Parent-parent: " + file.getParentFile().getParentFile().toString());
             file = new File(file.getParentFile().getParentFile().getAbsolutePath().replaceAll("file:",""));
         }
         boolean foundResources = false;
