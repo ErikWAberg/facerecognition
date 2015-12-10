@@ -42,10 +42,9 @@ public class RecognitionController {
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(RecognitionController.class);
 
-    //TODO Handle exceptions
 
     /**
-     * Handle requests to /identify - uses face recognition algorithm to
+     * Handle requests to /recog/detectIdentify - uses face recognition algorithm to
      * identify the person in an uploaded image file.
      *
      * @return DTO containing predicted name of person and down-scaled image with rect around face
@@ -63,6 +62,11 @@ public class RecognitionController {
         return recognitionService.detectedAndIdentifyAsync(requestEntity.getBody(), imageType, imageWidth, imageHeight);
     }
 
+    /**
+     * Handle requests to /recog/detect - drawing a box around every detected face
+     * in the image.
+     * @return DTO containing the modified picture
+     */
     @RequestMapping(value = ApiUrls.URL_RECOG_DETECT, method = RequestMethod.POST)
     public
     RecognitionDTO
@@ -74,16 +78,6 @@ public class RecognitionController {
         logger.info("Detection only. Image type: " + imageType + ", width: " + imageWidth+ ", height: " + imageHeight);
 
         return recognitionService.detect(requestEntity.getBody(), imageType, imageWidth, imageHeight);
-    }
-
-    @RequestMapping(value = ApiUrls.URL_RECOG_IDENTIFY_SIMPLE, method = RequestMethod.POST)
-    public
-    String
-    identify(final HttpEntity<byte[]> requestEntity) throws ExecutionException, InterruptedException {
-        logger.info("Simple identification");
-
-        byte[] byteImage = requestEntity.getBody();
-        return recognitionService.simpleIdentification(byteImage);
     }
 
 

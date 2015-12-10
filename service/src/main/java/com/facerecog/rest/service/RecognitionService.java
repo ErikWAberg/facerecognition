@@ -129,18 +129,6 @@ public class RecognitionService {
         return imageMat;
     }
 
-    public String simpleIdentification(byte[] byteImage) {
-        long t1 = System.currentTimeMillis();
-        IplImage iplColored = IplImage.create(1080, 720, IPL_DEPTH_8U, 3);
-        BytePointer bp = iplColored.imageData();
-        bp.put(byteImage);
-        IplImage iplGray = Util.iplImage2gray(iplColored);
-        Mat matGray = cvarrToMat(iplGray);
-        String predictedPerson = recogniser.predictPerson(matGray);
-        logger.info("Request completed after: " + (System.currentTimeMillis() - t1));
-        return predictedPerson;
-    }
-
     private static RecognitionDTO createIdentificationResponse(String predictedPerson, Mat mat) {
         RecognitionDTO recognitionDTO = new RecognitionDTO();
         recognitionDTO.setPredictedPerson(predictedPerson);

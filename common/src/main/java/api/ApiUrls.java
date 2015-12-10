@@ -23,8 +23,6 @@ public class ApiUrls {
     public static final String ROOT_URL_RECOG = "/recog";
     public static final String URL_RECOG_DETECT = "/detect";
     public static final String URL_RECOG_DETECT_IDENTIFY = "/detectIdentify";
-    //public static final String URL_RECOG_IDENTIFY = "/identify";
-    public static final String URL_RECOG_IDENTIFY_SIMPLE = "/identifySimple";
     public static final String URL_RECOG_UPLOAD_IMAGE = "/uploadImage";
 
 }
