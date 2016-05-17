@@ -1,4 +1,4 @@
-# facerecognition
+# Face Recognition and Detection in Java with OpenCV
 Deploys a web service & perform face recogntion by calling the service through a supplied client application.
 
 
